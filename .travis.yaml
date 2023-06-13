@@ -1,6 +1,10 @@
 sudo: required
 services:
   - docker
+env:
+  globals:
+    - SHA=$(git rev-parse HEAD)
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc
@@ -13,3 +17,8 @@ before_install:
   - docker build -t tjgersho/react-test -f ./client/Dockerfile.dev ./client
 script:
   - docker run -e CI=true tjgersho/react-test npm test -- --coverage
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master
